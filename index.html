@@ -1,0 +1,77 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Untitled Document.md</title><style></style></head><body id="preview">
+<h1><a id="Scenario_Deploying_Your_First_Docker_Container_0"></a>Scenario: Deploying Your First Docker Container</h1>
+<h2><a id="Step_1__Running_A_Container_2"></a>Step 1 - Running A Container</h2>
+<blockquote>
+<p>Search for docker images</p>
+</blockquote>
+<pre><code class="language-bash">docker search redis
+</code></pre>
+<blockquote>
+<p>To run the docker in background, the option -d needs to be specified.</p>
+</blockquote>
+<pre><code class="language-bash"> docker run <span class="hljs-operator">-d</span> redis
+</code></pre>
+<hr>
+<h2><a id="Step_2__Finding_Running_Containers_15"></a>Step 2 - Finding Running Containers</h2>
+<blockquote>
+<p>To lists all running containers</p>
+</blockquote>
+<pre><code class="language-bash">docker ps
+</code></pre>
+<blockquote>
+<p>To know more details about a running container, such as IP address.</p>
+</blockquote>
+<pre><code class="language-bash">docker inspect &lt;friendly-name|container-id&gt;
+</code></pre>
+<blockquote>
+<p>To get logs of a container</p>
+</blockquote>
+<pre><code class="language-bash">docker logs &lt;friendly-name|container-id&gt;
+</code></pre>
+<hr>
+<h2><a id="Step_3__Accessing_Redis_31"></a>Step 3 - Accessing Redis</h2>
+<blockquote>
+<p>To start redis container</p>
+</blockquote>
+<pre><code class="language-bash">docker run <span class="hljs-operator">-d</span> --name redisHostPort -p <span class="hljs-number">6379</span>:<span class="hljs-number">6379</span> redis:latest
+</code></pre>
+<blockquote>
+<p>just using the option -p 6379 enables her to expose Redis but on a randomly available port</p>
+</blockquote>
+<pre><code class="language-bash">docker run <span class="hljs-operator">-d</span> --name redisDynamic -p <span class="hljs-number">6379</span> redis:latest
+</code></pre>
+<blockquote>
+<p>To know which port has been assigned</p>
+</blockquote>
+<pre><code class="language-bash">docker port redisDynamic <span class="hljs-number">6379</span>
+</code></pre>
+<blockquote>
+<p><strong>docker ps</strong> displays the port mapping information</p>
+</blockquote>
+<pre><code class="language-bash">docker ps
+</code></pre>
+<hr>
+<h2><a id="Step_4__Persisting_Data_49"></a>Step 4 - Persisting Data</h2>
+<blockquote>
+<p>Any data which needs to be saved on the Docker Host, and not inside containers, should be stored in /opt/docker/data/redis.</p>
+</blockquote>
+<pre><code class="language-bash">docker run <span class="hljs-operator">-d</span> --name redisMapped -v /opt/docker/data/redis:/data redis
+</code></pre>
+<hr>
+<h2><a id="Step_5__Running_A_Container_In_The_Foreground_56"></a>Step 5 - Running A Container In The Foreground</h2>
+<blockquote>
+<p>Without specifing -d(–detach) option the container run in foregroud</p>
+</blockquote>
+<blockquote>
+<p>The following launches an Ubuntu container and executes the command ps to view all the processes running in a container.</p>
+</blockquote>
+<pre><code class="language-bash">docker run ubuntu ps
+</code></pre>
+<blockquote>
+<p>To access a bash shell inside a ubuntu container</p>
+</blockquote>
+<pre><code class="language-bash">docker run -it ubuntu bash
+</code></pre>
+<hr>
+
+</body></html>

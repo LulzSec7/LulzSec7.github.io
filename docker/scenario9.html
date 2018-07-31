@@ -1,48 +1,100 @@
-<h1 id="scenario-9-docker-networks">Scenario-9: Docker Networks</h1>
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>scenario9.md</title><style></style></head><body id="preview">
+<h1><a id="Scenario9_Docker_Networks_0"></a>Scenario-9: Docker Networks</h1>
 <blockquote>
-<p>This scenario explores how to create a docker network allowing containers to communicate. We'll also explore the Embedded DNS Server added in Docker 1.10.</p>
+<p>This scenario explores how to create a docker network allowing containers to communicate. We’ll also explore the Embedded DNS Server added in Docker 1.10.</p>
 </blockquote>
 <blockquote>
 <p>Docker has two approaches to networking. The first defines a link between two containers. This link updates /etc/hosts and environment variables to allow containers to discover and communicate.</p>
 </blockquote>
-<h2 id="the-alternate-approach-is-to-create-a-docker-network-that-containers-are-connected-too.-the-network-has-similar-attributes-to-a-physical-network-allowing-containers-to-come-and-go-more-freely-than-when-using-links.">&gt;The alternate approach is to create a docker network that containers are connected too. The network has similar attributes to a physical network, allowing containers to come and go more freely than when using links.</h2>
-<h2 id="step-1---create-network">Step 1 - Create Network</h2>
+<blockquote>
+<p>The alternate approach is to create a docker network that containers are connected too. The network has similar attributes to a physical network, allowing containers to come and go more freely than when using links.</p>
+</blockquote>
+<hr>
+<h2><a id="Step_1__Create_Network_9"></a>Step 1 - Create Network</h2>
 <blockquote>
 <p>command to create a network</p>
 </blockquote>
-<pre><code>docker network create backend-network</code></pre>
+<pre><code>docker network create backend-network
+</code></pre>
 <blockquote>
 <p>When we launch new containers, we can use the --net attribute to assign which network they should be connected to.</p>
 </blockquote>
-<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> run -d --name=redis --net=backend-network redis</code></pre>
-<h2 id="step-3---connect-two-containers">Step 3 - Connect Two Containers</h2>
+<pre><code class="language-bash">docker run <span class="hljs-operator">-d</span> --name=redis --net=backend-network redis
+</code></pre>
+<hr>
+<h2><a id="Step_2__Network_Communication_19"></a>Step 2 - Network Communication</h2>
+<blockquote>
+<p>Unlike using links, docker network behave like traditional networks where nodes can be attached/detached.</p>
+</blockquote>
+<blockquote>
+<p>The first thing you’ll notice is that Docker no longer assigns environment variables or updates the hosts file of containers. Explore using the following two commands and you’ll notice it no longer mentions other containers.</p>
+</blockquote>
+<pre><code class="language-bash">docker run --net=backend-network alpine env
+</code></pre>
+<pre><code class="language-bash">docker run --net=backend-network alpine cat /etc/hosts
+</code></pre>
+<blockquote>
+<p>Instead, the way containers can communicate via an Embedded DNS Server in Docker. This DNS server is assigned to all containers via the IP 127.0.0.11 and set in the resolv.conf file.</p>
+</blockquote>
+<pre><code class="language-bash">docker run --net=backend-network alpine cat /etc/resolv.conf
+</code></pre>
+<blockquote>
+<p>When containers attempt to access other containers via a well-known name, such as Redis, the DNS server will return the IP address of the correct Container. In this case, the fully qualified name of Redis will be redis.backend-network.</p>
+</blockquote>
+<pre><code class="language-bash">docker run --net=backend-network alpine ping -c1 redis
+</code></pre>
+<hr>
+<h2><a id="Step_3__Connect_Two_Containers_39"></a>Step 3 - Connect Two Containers</h2>
 <blockquote>
 <p>The first task is to create a new network in the same way.</p>
 </blockquote>
-<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> network create frontend-network</code></pre>
+<pre><code class="language-bash">docker network create frontend-network
+</code></pre>
 <blockquote>
 <p>When using the connect command it is possible to attach existing containers to the network.</p>
 </blockquote>
-<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> network connect frontend-network redis</code></pre>
+<pre><code class="language-bash">docker network connect frontend-network redis
+</code></pre>
 <blockquote>
-<p>When we launch the web server, given it's attached to the same network it will be able to communicate with our Redis instance</p>
+<p>When we launch the web server, given it’s attached to the same network it will be able to communicate with our Redis instance</p>
 </blockquote>
-<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> run -d -p 3000:3000 --net=frontend-network katacoda/redis-node-docker-example</code></pre>
+<pre><code class="language-bash">docker run <span class="hljs-operator">-d</span> -p <span class="hljs-number">3000</span>:<span class="hljs-number">3000</span> --net=frontend-network katacoda/redis-node-docker-example
+</code></pre>
 <blockquote>
 <p>You can test it using</p>
 </blockquote>
-<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">curl</span> docker:3000</code></pre>
-<h2 id="step-5---disconnect-containers">Step 5 - Disconnect Containers</h2>
+<pre><code class="language-bash">curl docker:<span class="hljs-number">3000</span>
+</code></pre>
+<hr>
+<h2><a id="Step_4__Create_Aliases_57"></a>Step 4 - Create Aliases</h2>
+<blockquote>
+<p>The following command will connect our Redis instance to the frontend-network with the alias of db.</p>
+</blockquote>
+<pre><code class="language-bash">docker network create frontend-network2
+docker network connect --alias db frontend-network2 redis
+</code></pre>
+<blockquote>
+<p>When containers attempt to access a service via the name db, they will be given the IP address of our Redis container.</p>
+</blockquote>
+<pre><code class="language-bash">docker run --net=frontend-network2 alpine ping -c1 db
+</code></pre>
+<hr>
+<h2><a id="Step_5__Disconnect_Containers_69"></a>Step 5 - Disconnect Containers</h2>
 <blockquote>
 <p>The following command will list all the networks on our host.</p>
 </blockquote>
-<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> network ls</code></pre>
+<pre><code class="language-bash">docker network ls
+</code></pre>
 <blockquote>
 <p>We can then explore the network to see which containers are attached and their IP addresses.</p>
 </blockquote>
-<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> network inspect frontend-network</code></pre>
+<pre><code class="language-bash">docker network inspect frontend-network
+</code></pre>
 <blockquote>
 <p>The following command disconnects the redis container from the frontend-network.</p>
 </blockquote>
-<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> network disconnect frontend-network redis</code></pre>
-<hr />
+<pre><code class="language-bash">docker network disconnect frontend-network redis
+</code></pre>
+<hr>
+
+</body></html>

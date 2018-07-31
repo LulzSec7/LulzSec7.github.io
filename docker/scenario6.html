@@ -1,40 +1,65 @@
-<h1 id="scenario-6-ignoring-files">Scenario-6: Ignoring Files</h1>
-<h2 id="in-this-scenario-well-explore-how-you-can-ignore-certain-files-from-ending-up-inside-a-docker-image-that-can-introduce-security-risks.-this-scenario-also-investigates-how-you-can-reduce-the-build-time-by-ignoring-which-files-are-sent-to-the-docker-build-context.">&gt;In this scenario, we'll explore how you can ignore certain files from ending up inside a Docker image that can introduce security risks. This scenario also investigates how you can reduce the build time by ignoring which files are sent to the Docker Build Context.</h2>
-<h2 id="step-1---docker-ignore">Step 1 - Docker Ignore</h2>
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>scenario6.md</title><style></style></head><body id="preview">
+<h1><a id="Scenario6_Ignoring_Files_0"></a>Scenario-6: Ignoring Files</h1>
 <blockquote>
-<p>To prevent sensitive files or directories from being included by mistake in images, you can add a file named .dockerignore. A Dockerfile copies the working directory into the Docker Image. As a result, this would include potentially sensitive information such as a passwords file which we'd want to manage outside the image. View the Dockerfile with</p>
+<p>In this scenario, we’ll explore how you can ignore certain files from ending up inside a Docker image that can introduce security risks. This scenario also investigates how you can reduce the build time by ignoring which files are sent to the Docker Build Context.</p>
 </blockquote>
-<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">cat</span> Dockerfile</code></pre>
+<hr>
+<h2><a id="Step_1__Docker_Ignore_3"></a>Step 1 - Docker Ignore</h2>
+<blockquote>
+<p>To prevent sensitive files or directories from being included by mistake in images, you can add a file named .dockerignore.<br>
+A Dockerfile copies the working directory into the Docker Image. As a result, this would include potentially sensitive information such as a passwords file which we’d want to manage outside the image. View the Dockerfile with</p>
+</blockquote>
+<pre><code class="language-bash">cat Dockerfile
+</code></pre>
 <blockquote>
 <p>Build the image with</p>
 </blockquote>
-<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> build -t password .</code></pre>
+<pre><code class="language-bash">docker build -t password .
+</code></pre>
 <blockquote>
 <p>Look at the output using</p>
 </blockquote>
-<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> run password ls /app</code></pre>
+<pre><code class="language-bash">docker run password ls /app
+</code></pre>
 <blockquote>
-<p>This will include the passwords file. The following command would include passwords.txt in our .dockerignore file and ensure that it didn't accidentally end up in a container.</p>
+<p>This will include the passwords file.<br>
+The following command would include passwords.txt in our .dockerignore file and ensure that it didn’t accidentally end up in a container.</p>
 </blockquote>
-<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">echo</span> passwords.txt <span class="kw">&gt;&gt;</span> .dockerignore</code></pre>
+<pre><code class="language-bash"><span class="hljs-built_in">echo</span> passwords.txt &gt;&gt; .dockerignore
+</code></pre>
 <blockquote>
-<p>Now Build the image, because of the Docker Ignore file it shouldn't include the passwords file.</p>
+<p>Now Build the image, because of the Docker Ignore file it shouldn’t include the passwords file.</p>
 </blockquote>
-<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> build -t nopassword .</code></pre>
+<pre><code class="language-bash">docker build -t nopassword .
+</code></pre>
 <blockquote>
 <p>Look at the output using</p>
 </blockquote>
-<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> run nopassword ls /app</code></pre>
-<h2 id="step-3---optimised-build">Step 3 - Optimised Build</h2>
+<pre><code class="language-bash">docker run nopassword ls /app
+</code></pre>
+<hr>
+<h2><a id="Step_2__Docker_Build_Context_31"></a>Step 2 - Docker Build Context</h2>
+<blockquote>
+<p>In the environment, a 100M temporary file has been created. This file is never used by the Dockerfile. When you execute a build command, Docker sends the entire path contents to the Engine for it to calculate which files to include. As a result sending the 100M file is unrequired and creates a slower build.<br>
+You can see the 100M impact by executing following the command.</p>
+</blockquote>
+<pre><code class="language-bash">docker build -t large-file-context .
+</code></pre>
+<hr>
+<h2><a id="Step_3__Optimised_Build_38"></a>Step 3 - Optimised Build</h2>
 <blockquote>
 <p>To speed up our build, simply include the filename of the large file in the ignore file.</p>
 </blockquote>
-<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">echo</span> big-temp-file.img <span class="kw">&gt;&gt;</span> .dockerignore</code></pre>
+<pre><code class="language-bash"><span class="hljs-built_in">echo</span> big-temp-file.img &gt;&gt; .dockerignore
+</code></pre>
 <blockquote>
-<p>When we rebuild the image, it will be much faster as it doesn't have to copy the 100M file.</p>
+<p>When we rebuild the image, it will be much faster as it doesn’t have to copy the 100M file.</p>
 </blockquote>
-<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> build -t no-large-file-context .</code></pre>
+<pre><code class="language-bash">docker build -t no-large-file-context .
+</code></pre>
 <blockquote>
 <p>This optimisation has a greater impact when ignoring large directories such as .git.</p>
 </blockquote>
-<hr />
+<hr>
+
+</body></html>

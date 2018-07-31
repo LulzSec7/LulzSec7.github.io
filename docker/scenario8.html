@@ -1,16 +1,63 @@
-<h1 id="scenario-8-communicating-between-containers">Scenario-8: Communicating Between Containers</h1>
-<h2 id="this-scenario-explores-how-to-allow-multiple-containers-to-communicate-with-each-other.-the-steps-will-explain-how-to-connect-a-data-store-in-this-case-redis-to-an-application-running-in-a-separate-container.">&gt;This scenario explores how to allow multiple containers to communicate with each other. The steps will explain how to connect a data-store, in this case, Redis, to an application running in a separate container.</h2>
-<h2 id="step-1---start-redis">Step 1 - Start Redis</h2>
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>scenario8.md</title><style></style></head><body id="preview">
+<h1><a id="Scenario8_Communicating_Between_Containers_0"></a>Scenario-8: Communicating Between Containers</h1>
 <blockquote>
-<p>Run a redis server with a friendly name of redis-server which we'll connect to in the next step. This will be our source container.</p>
+<p>This scenario explores how to allow multiple containers to communicate with each other. The steps will explain how to connect a data-store, in this case, Redis, to an application running in a separate container.</p>
 </blockquote>
-<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> run -d --name redis-server redis</code></pre>
-<h2 id="step-3---connect-to-app">Step 3 - Connect To App</h2>
+<hr>
+<h2><a id="Step_1__Start_Redis_4"></a>Step 1 - Start Redis</h2>
+<blockquote>
+<p>Run a redis server with a friendly name of redis-server which we’ll connect to in the next step. This will be our source container.</p>
+</blockquote>
+<pre><code class="language-bash">docker run <span class="hljs-operator">-d</span> --name redis-server redis
+</code></pre>
+<hr>
+<h2><a id="Step_2__Create_Link_10"></a>Step 2 - Create Link</h2>
+<blockquote>
+<p>To connect to a source container you use the --link &lt;container-name|id&gt;:&lt;alias&gt; option when launching a new container. The container name refers to the source container we defined in the previous step while the alias defines the friendly name of the host.</p>
+</blockquote>
+<blockquote>
+<p>First, Docker will set some environment variables based on the linked to the container. These environment variables give you a way to reference information such as Ports and IP addresses via known names.</p>
+</blockquote>
+<blockquote>
+<p>You can output all the environment variables with the env command. For example:</p>
+</blockquote>
+<pre><code class="language-bash">docker run --link redis-server:redis alpine env
+</code></pre>
+<blockquote>
+<p>Secondly, Docker will update the HOSTS file of the container with an entry for our source container with three names, the original, the alias and the hash-id. You can output the containers host entry using cat /etc/hosts</p>
+</blockquote>
+<pre><code class="language-bash">docker run --link redis-server:redis alpine cat /etc/hosts
+</code></pre>
+<blockquote>
+<p>With a link created you can ping the source container in the same way as if it were a server running in your network.</p>
+</blockquote>
+<pre><code class="language-bash">docker run --link redis-server:redis alpine ping -c <span class="hljs-number">1</span> redis
+</code></pre>
+<hr>
+<h2><a id="Step_3__Connect_To_App_28"></a>Step 3 - Connect To App</h2>
 <blockquote>
 <p>Here is a simple node.js application which connects to redis using the hostname redis.</p>
 </blockquote>
-<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> run -d -p 3000:3000 --link redis-server:redis katacoda/redis-node-docker-example</code></pre>
+<pre><code class="language-bash">docker run <span class="hljs-operator">-d</span> -p <span class="hljs-number">3000</span>:<span class="hljs-number">3000</span> --link redis-server:redis katacoda/redis-node-docker-example
+</code></pre>
 <blockquote>
-<p>Sending an HTTP request to the application will store the request in Redis and return a count. If you issue multiple requests, you'll see the counter increment as items are persisted.</p>
+<p>Sending an HTTP request to the application will store the request in Redis and return a count. If you issue multiple requests, you’ll see the counter increment as items are persisted.</p>
 </blockquote>
-<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">curl</span> docker:3000</code></pre>
+<pre><code class="language-bash">curl docker:<span class="hljs-number">3000</span>
+</code></pre>
+<hr>
+<h2><a id="Step_4__Connect_to_Redis_CLI_38"></a>Step 4 - Connect to Redis CLI</h2>
+<blockquote>
+<p>The command below will launch an instance of the Redis-cli tool and connect to the redis server via it’s alias.</p>
+</blockquote>
+<pre><code class="language-bash">docker run -it --link redis-server:redis redis redis-cli -h redis
+</code></pre>
+<blockquote>
+<p>The command KEYS * will output the contents stored currently in the source redis container.</p>
+</blockquote>
+<blockquote>
+<p>Type QUIT to exit the CLI.</p>
+</blockquote>
+<hr>
+
+</body></html>

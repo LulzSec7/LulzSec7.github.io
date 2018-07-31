@@ -1,0 +1,16 @@
+<h1 id="scenario-8-communicating-between-containers">Scenario-8: Communicating Between Containers</h1>
+<h2 id="this-scenario-explores-how-to-allow-multiple-containers-to-communicate-with-each-other.-the-steps-will-explain-how-to-connect-a-data-store-in-this-case-redis-to-an-application-running-in-a-separate-container.">&gt;This scenario explores how to allow multiple containers to communicate with each other. The steps will explain how to connect a data-store, in this case, Redis, to an application running in a separate container.</h2>
+<h2 id="step-1---start-redis">Step 1 - Start Redis</h2>
+<blockquote>
+<p>Run a redis server with a friendly name of redis-server which we'll connect to in the next step. This will be our source container.</p>
+</blockquote>
+<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> run -d --name redis-server redis</code></pre>
+<h2 id="step-3---connect-to-app">Step 3 - Connect To App</h2>
+<blockquote>
+<p>Here is a simple node.js application which connects to redis using the hostname redis.</p>
+</blockquote>
+<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> run -d -p 3000:3000 --link redis-server:redis katacoda/redis-node-docker-example</code></pre>
+<blockquote>
+<p>Sending an HTTP request to the application will store the request in Redis and return a count. If you issue multiple requests, you'll see the counter increment as items are persisted.</p>
+</blockquote>
+<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">curl</span> docker:3000</code></pre>

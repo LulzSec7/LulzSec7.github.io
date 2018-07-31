@@ -1,0 +1,26 @@
+<h1 id="scenario-5-optimising-dockerfile-with-onbuild">Scenario-5: Optimising Dockerfile with OnBuild</h1>
+<h2 id="step-1---onbuild">Step 1 - OnBuild</h2>
+<blockquote>
+<p>Below is the Node.js OnBuild Dockerfile.</p>
+</blockquote>
+<pre class="docker"><code>FROM node:7
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+ONBUILD COPY package.json /usr/src/app/
+ONBUILD RUN npm install
+ONBUILD COPY . /usr/src/app
+CMD [ &quot;npm&quot;, &quot;start&quot; ]</code></pre>
+<h2 id="step-2---building-launching-container">Step 2 - Building &amp; Launching Container</h2>
+<blockquote>
+<p>The command to build the image is</p>
+</blockquote>
+<pre class="docker"><code>docker build -t my-nodejs-app .</code></pre>
+<blockquote>
+<p>The command to launch the built image is</p>
+</blockquote>
+<pre class="docker"><code>docker run -d --name my-running-app -p 3000:3000 my-nodejs-app</code></pre>
+<blockquote>
+<p>You can test the container is accessible using curl</p>
+</blockquote>
+<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">curl</span> http://docker:3000</code></pre>
+<hr />

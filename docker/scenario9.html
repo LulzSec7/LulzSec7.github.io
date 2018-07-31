@@ -1,0 +1,48 @@
+<h1 id="scenario-9-docker-networks">Scenario-9: Docker Networks</h1>
+<blockquote>
+<p>This scenario explores how to create a docker network allowing containers to communicate. We'll also explore the Embedded DNS Server added in Docker 1.10.</p>
+</blockquote>
+<blockquote>
+<p>Docker has two approaches to networking. The first defines a link between two containers. This link updates /etc/hosts and environment variables to allow containers to discover and communicate.</p>
+</blockquote>
+<h2 id="the-alternate-approach-is-to-create-a-docker-network-that-containers-are-connected-too.-the-network-has-similar-attributes-to-a-physical-network-allowing-containers-to-come-and-go-more-freely-than-when-using-links.">&gt;The alternate approach is to create a docker network that containers are connected too. The network has similar attributes to a physical network, allowing containers to come and go more freely than when using links.</h2>
+<h2 id="step-1---create-network">Step 1 - Create Network</h2>
+<blockquote>
+<p>command to create a network</p>
+</blockquote>
+<pre><code>docker network create backend-network</code></pre>
+<blockquote>
+<p>When we launch new containers, we can use the --net attribute to assign which network they should be connected to.</p>
+</blockquote>
+<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> run -d --name=redis --net=backend-network redis</code></pre>
+<h2 id="step-3---connect-two-containers">Step 3 - Connect Two Containers</h2>
+<blockquote>
+<p>The first task is to create a new network in the same way.</p>
+</blockquote>
+<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> network create frontend-network</code></pre>
+<blockquote>
+<p>When using the connect command it is possible to attach existing containers to the network.</p>
+</blockquote>
+<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> network connect frontend-network redis</code></pre>
+<blockquote>
+<p>When we launch the web server, given it's attached to the same network it will be able to communicate with our Redis instance</p>
+</blockquote>
+<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> run -d -p 3000:3000 --net=frontend-network katacoda/redis-node-docker-example</code></pre>
+<blockquote>
+<p>You can test it using</p>
+</blockquote>
+<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">curl</span> docker:3000</code></pre>
+<h2 id="step-5---disconnect-containers">Step 5 - Disconnect Containers</h2>
+<blockquote>
+<p>The following command will list all the networks on our host.</p>
+</blockquote>
+<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> network ls</code></pre>
+<blockquote>
+<p>We can then explore the network to see which containers are attached and their IP addresses.</p>
+</blockquote>
+<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> network inspect frontend-network</code></pre>
+<blockquote>
+<p>The following command disconnects the redis container from the frontend-network.</p>
+</blockquote>
+<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> network disconnect frontend-network redis</code></pre>
+<hr />

@@ -1,0 +1,20 @@
+<h1 id="scenario-7-data-containers">Scenario-7: Data Containers</h1>
+<h2 id="there-are-two-ways-of-approaching-stateful-containers-that-is-containers-are-store-and-persistent-data-for-future-use.-this-could-be-the-container-creating-and-storing-data-for-example-a-database.-alternatively-it-could-be-data-requiring-additional-for-instance-the-configuration-or-ssl-certifications.-this-approach-can-also-be-used-to-backup-data-or-debug-containers.">&gt;There are two ways of approaching stateful Containers, that is containers are store and persistent data for future use. This could be the container creating and storing data, for example, a database. Alternatively, it could be data requiring additional for instance the configuration or SSL certifications. This approach can also be used to backup data or debug containers.</h2>
+<h1 id="step-1---create-container">Step 1 - Create Container</h1>
+<blockquote>
+<p>To create a Data Container we first create a container with a well-known name for future reference. We use busybox as the base as it's small and lightweight in case we want to explore and move the container to another host. When creating the container, we also provide a -v option to define where other containers will be reading/saving data. Create a Data Container for storing</p>
+</blockquote>
+<blockquote>
+<p>configuration files using</p>
+</blockquote>
+<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> create -v /config --name dataContainer busybox</code></pre>
+<h1 id="step-4---export-import-containers">Step 4 - Export / Import Containers</h1>
+<blockquote>
+<p>If we wanted to move the Data Container to another machine then we can export it to a .tar file.</p>
+</blockquote>
+<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> export dataContainer <span class="kw">&gt;</span> dataContainer.tar</code></pre>
+<blockquote>
+<p>The following command will import the Data Container back into Docker.</p>
+</blockquote>
+<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> import dataContainer.tarv</code></pre>
+<hr />

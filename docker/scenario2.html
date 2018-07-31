@@ -1,0 +1,17 @@
+<h1 id="scenario-2-deploy-static-html-website-as-container">Scenario-2: Deploy Static HTML Website as Container</h1>
+<h2 id="step-1---create-dockerfile">Step 1 - Create Dockerfile</h2>
+<blockquote>
+<p>Step 1 - Create Dockerfile</p>
+</blockquote>
+<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">FROM</span> nginx:alpine
+<span class="kw">COPY</span> . /usr/share/nginx/html</code></pre>
+<h2 id="the-first-line-defines-our-base-image.-the-second-line-copies-the-content-of-the-current-directory-into-a-particular-location-inside-the-container.">&gt;The first line defines our base image. The second line copies the content of the current directory into a particular location inside the container.</h2>
+<h2 id="step-2---build-docker-image">Step 2 - Build Docker Image</h2>
+<blockquote>
+<p>Build our static HTML image using the build command below.</p>
+</blockquote>
+<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> build -t webserver-image:v1 .</code></pre>
+<blockquote>
+<p>You can view a list of all the images on the host using</p>
+</blockquote>
+<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docker</span> images</code></pre>

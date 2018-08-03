@@ -1,0 +1,73 @@
+<h1><a id="Scenario14_Load_Balancing_Containers_0"></a>Scenario-14: Load Balancing Containers</h1>
+<blockquote>
+<p>In this session, we’ll explore how you can use the NGINX web server to load balance requests between two containers running on the host.</p>
+</blockquote>
+<blockquote>
+<p>With Docker, there are two main ways for containers to communicate with each other. The first is via links which configure the container with environment variables and host entry allowing them to communicate. The second is using the Service Discovery pattern where uses information provided by third parties, in this scenario, it will be Docker’s API.</p>
+</blockquote>
+<blockquote>
+<p>The Service Discovery pattern is where the application uses a third party system to identify the location of the target service. For example, if our application wanted to talk to a database, it would first ask an API what the IP address of the database is. This pattern allows you to quickly reconfigure and scale your architectures with improved fault tolerance than fixed locations.</p>
+</blockquote>
+<hr>
+<h2><a id="Step_1__NGINX_Proxy_9"></a>Step 1 - NGINX Proxy</h2>
+<blockquote>
+<p>Use the command below to launch nginx-proxy.</p>
+</blockquote>
+<pre><code class="language-bash">docker run <span class="hljs-operator">-d</span> -p <span class="hljs-number">80</span>:<span class="hljs-number">80</span> <span class="hljs-operator">-e</span> DEFAULT_HOST=proxy.example -v /var/run/docker.sock:/tmp/docker.sock:ro --name nginx jwilder/nginx-proxy
+</code></pre>
+<blockquote>
+<p>Because we’re using a DEFAULT_HOST, any requests which come in will be directed to the container that has been assigned the HOST proxy.example.</p>
+</blockquote>
+<blockquote>
+<p>You can make a request to the web server using</p>
+</blockquote>
+<pre><code class="language-bash">curl http://docker
+</code></pre>
+<blockquote>
+<p>As we have no containers, it will return a 503 error.</p>
+</blockquote>
+<hr>
+<h2><a id="Step_2__Single_Host_22"></a>Step 2 - Single Host</h2>
+<blockquote>
+<p>For Nginx-proxy to start sending requests to a container you need to specify the VIRTUAL_HOST environment variable. This variable defines the domain where requests will come from and should be handled by the container.</p>
+</blockquote>
+<blockquote>
+<p>In this scenario we’ll set our HOST to match our DEFAULT_HOST so it will accept all requests.</p>
+</blockquote>
+<pre><code class="language-bash">docker run <span class="hljs-operator">-d</span> -p <span class="hljs-number">80</span> <span class="hljs-operator">-e</span> VIRTUAL_HOST=proxy.example katacoda/docker-http-server
+</code></pre>
+<blockquote>
+<p>Sometimes it takes a few seconds for NGINX to reload but if we execute a request to our proxy using</p>
+</blockquote>
+<pre><code class="language-bash">curl http://docker
+</code></pre>
+<blockquote>
+<p>then the request will be handled by our container.</p>
+</blockquote>
+<hr>
+<h2><a id="Step_3__Cluster_36"></a>Step 3 - Cluster</h2>
+<blockquote>
+<p>We now have successfully created a container to handle our HTTP requests. If we launch a second container with the same VIRTUAL_HOST then nginx-proxy will configure the system in a round-robin load balanced scenario. This means that the first request will go to one container, the second request to a second container and then repeat in a circle. There is no limit to the number of nodes you can have running.</p>
+</blockquote>
+<blockquote>
+<p>Launch a second container using the same command as we did before.</p>
+</blockquote>
+<pre><code class="language-bash">docker run <span class="hljs-operator">-d</span> -p <span class="hljs-number">80</span> <span class="hljs-operator">-e</span> VIRTUAL_HOST=proxy.example katacoda/docker-http-server
+</code></pre>
+<blockquote>
+<p>Send the request to our proxy and check</p>
+</blockquote>
+<pre><code class="language-bash">curl http://docker
+</code></pre>
+<h2><a id="Step_4__Generated_NGINX_Configuration_47"></a>Step 4 - Generated NGINX Configuration</h2>
+<blockquote>
+<p>While nginx-proxy automatically creates and configures NGINX for us, if you’re interested in what the final configuration looks like then you can output the complete config file with docker exec as shown below.</p>
+</blockquote>
+<pre><code class="language-bash">docker <span class="hljs-built_in">exec</span> nginx cat /etc/nginx/conf.d/default.conf
+</code></pre>
+<blockquote>
+<p>Additional information about when it reloads configuration can be found in the logs using</p>
+</blockquote>
+<pre><code class="language-docker">docker logs nginx
+</code></pre>
+<hr>
